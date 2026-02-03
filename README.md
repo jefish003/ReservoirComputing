@@ -1,1 +1,1 @@
-A reservoir computer for exploring how valid prediction time is affected by choice of the reservoir itself. 
+A reservoir computer for exploring how valid prediction time is affected by choice of the reservoir itself. We start with parameters optimized, as was done in "Emergence of a resonance in machine learning" by Zeng-Meng Zhai, Ling-Wei Kong and Ying-Cheng Lai (see also https://github.com/Zheng-Meng/Reservoir-Computing-and-Hyperparameter-Optimization) and from this optimized state we adjust only the reservoir and see the results. 

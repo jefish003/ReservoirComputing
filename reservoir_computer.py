@@ -117,9 +117,9 @@ class reservoir_computer:
         rows, cols = np.triu_indices(self.n)
         idx = np.random.choice(total_upper, size=nnz, replace=False)
         if self.res_distribution == 'normal' or self.res_distribution =='gaussian':
-            U = np.random.normal(0,self.res_weights,(self.n, self.n), dtype=float)
+            U = np.random.normal(0,self.res_weights,(self.n, self.n))
         elif self.res_distribution == 'uniform':
-            U = np.random.uniform(-self.res_weights,self.res_weights,(self.n, self.n), dtype=float)
+            U = np.random.uniform(-self.res_weights,self.res_weights,(self.n, self.n))
         
         else:
             raise ValueError("(Note dense distribution will match res_distribution) res_distribution must either be normal/gaussian or uniform ")
@@ -152,7 +152,7 @@ class reservoir_computer:
         rows, cols = np.triu_indices(self.n)
         idx = np.random.choice(total_upper, size=nnz, replace=False)
     
-        U = np.zeros((self.n, self.n), dtype=float)
+        U = np.zeros((self.n, self.n))
     
         if value_fn is None:
             if self.res_distribution == 'normal' or self.res_distribution == 'gaussian':

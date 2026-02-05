@@ -5,6 +5,9 @@ from scipy.linalg import schur
 class reservoir_computer:
     
     def __init__(self,data_in,data_out,n=200,spectral_radius=None,gamma=None,Win_dist = 'uniform',Win=None,A=None,reservoir_type='erdos_renyi',res_weights=1,res_distribution='normal',res_density=0.02,ws_p=0.1,a=0,non_normal_type='sparse',scale_A=True,input_noise=True,in_noise=None,alpha=None,activation=np.tanh,beta=None,maintain_res_eigs=False):
+        #If below is true, then the eigenvalues will be maintained while the eigenvalues stay the same
+        #if false then the eigenvalues of the reservoir are allowed to change. 
+        self.maintain_res_eigs = maintain_res_eigs        
         self.data_in = data_in
         self.data_out = data_out
         #spectral radius of the reservoir
@@ -43,6 +46,8 @@ class reservoir_computer:
             
             elif Win_dist == 'normal' or Win_dist == 'gaussian':
                 self.Win = np.random.normal(0,self.gamma,(n,dim))
+        else:
+            self.Win = Win
         
         #The type of reservoir, like Erdos-Renyi for example
         self.reservoir_type = reservoir_type
@@ -77,8 +82,8 @@ class reservoir_computer:
         else:
             self.beta = beta
         
-        self.maintain_res_eigs = maintain_res_eigs
-
+    def return_Win(self):
+        return self.Win
     def generate_res_distribution(self):
         if self.res_distribution == 'normal' or self.res_distribution == 'gaussian':
             R = np.random.normal(0,self.res_weights,(self.n,self.n))
@@ -318,14 +323,15 @@ class reservoir_computer:
         return T
 
     def non_normal_maintain_eigs(self,A):
-        newA = 1
-        T,Q = schur(A,output='complex')
+        #In this case, need to make sure that a real matrix is returned, so
+        #use output = 'real' in the schur decomposition
+        T,Q = schur(A,output='real')
         if self.non_normal_type == 'sparse':
             N = self.sparse_upper_triangular()
         
         else:
             N = self.dense_upper_triangular()
-        newA = Q @ (T+N) @ Q.conj().T
+        newA = Q @ (T+N) @ Q.T
         
         
         return newA

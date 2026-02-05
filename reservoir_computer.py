@@ -1,17 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Feb  3 11:12:37 2026
-
-@author: jafish
-"""
-
 import numpy as np
 import networkx as nx
 from scipy.linalg import schur
 
 class reservoir_computer:
     
-    def __init__(self,data_in,data_out,n=200,spectral_radius=None,gamma=None,Win_dist = 'uniform',Win=None,A=None,reservoir_type='erdos_renyi',res_weights=1,res_distribution='normal',res_density=0.02,ws_p=0.1,a=0,non_normal_type='sparse',scale_A=True,input_noise=True,in_noise=None,alpha=None,activation=np.tanh,beta=None):
+    def __init__(self,data_in,data_out,n=200,spectral_radius=None,gamma=None,Win_dist = 'uniform',Win=None,A=None,reservoir_type='erdos_renyi',res_weights=1,res_distribution='normal',res_density=0.02,ws_p=0.1,a=0,non_normal_type='sparse',scale_A=True,input_noise=True,in_noise=None,alpha=None,activation=np.tanh,beta=None,maintain_res_eigs=False):
         self.data_in = data_in
         self.data_out = data_out
         #spectral radius of the reservoir
@@ -83,6 +76,8 @@ class reservoir_computer:
             self.beta = 0.0004361
         else:
             self.beta = beta
+        
+        self.maintain_res_eigs = maintain_res_eigs
 
     def generate_res_distribution(self):
         if self.res_distribution == 'normal' or self.res_distribution == 'gaussian':
@@ -322,58 +317,111 @@ class reservoir_computer:
     
         return T
 
-
+    def non_normal_maintain_eigs(self,A):
+        newA = 1
+        T,Q = schur(A,output='complex')
+        if self.non_normal_type == 'sparse':
+            N = self.sparse_upper_triangular()
+        
+        else:
+            N = self.dense_upper_triangular()
+        newA = Q @ (T+N) @ Q.conj().T
+        
+        
+        return newA
+        
     def generate_A(self):
-        
-        if self.reservoir_type == 'erdos_renyi':
-            G = nx.erdos_renyi_graph(self.n,self.res_density)
-            A = nx.to_numpy_array(G)
-            R = self.generate_res_distribution()
-            R = (R+R.T)/2
-            A = A*R
-            if self.a>0:
-                if self.non_normal_type=='sparse':
-                    A = A+self.a*self.sparse_upper_triangular()
-                elif self.non_normal_type == 'dense':
-                    A = A+self.a*self.dense_upper_triangular()
-        
-        elif self.reservoir_type == 'barabasi_albert':
-            m = int(np.floor(self.n*self.res_density))
-            G = nx.barabasi_albert_graph(self.n,m)
-            A = nx.to_numpy_array(G)
-            R = self.generate_res_distribution()
-            R = (R+R.T)/2
-            A = A*R   
-            if self.a>0:
-                if self.non_normal_type=='sparse':
-                    A = A+self.a*self.sparse_upper_triangular()
-                elif self.non_normal_type == 'dense':
-                    A = A+self.a*self.dense_upper_triangular()            
-        
-        elif self.reservoir_type == 'watts_strogatz':
-            k = int(np.ceil(self.n*self.res_density))
-            G = nx.watts_strogatz_graph(self.n,k,self.ws_p)
-            A = nx.to_numpy_array(G)
-            R = self.generate_res_distribution()
-            R = (R+R.T)/2
-            A = A*R
-            if self.a>0:
-                if self.non_normal_type=='sparse':
-                    A = A+self.a*self.sparse_upper_triangular()
-                elif self.non_normal_type == 'dense':
-                    A = A+self.a*self.dense_upper_triangular()            
-
-        elif self.reservoir_type == 'toeplitz':
-            A = self.toeplitz_reservoir()
-        
-        elif self.reservoir_type == 'jacobi':
-            A = self.jacobi_matrix()
-        
-        elif self.reservoir_type == 'circulant':
-            A = self.circulant_reservoir()
-        
-        else: 
-            raise ValueError("Note "+str(self.reservoir_type)+" is not an allowed reservoir type.")
+        if not self.maintain_res_eigs:
+            if self.reservoir_type == 'erdos_renyi':
+                G = nx.erdos_renyi_graph(self.n,self.res_density)
+                A = nx.to_numpy_array(G)
+                R = self.generate_res_distribution()
+                R = (R+R.T)/2
+                A = A*R
+                if self.a>0:
+                    if self.non_normal_type=='sparse':
+                        A = A+self.a*self.sparse_upper_triangular()
+                    elif self.non_normal_type == 'dense':
+                        A = A+self.a*self.dense_upper_triangular()
+            
+            elif self.reservoir_type == 'barabasi_albert':
+                m = int(np.floor(self.n*self.res_density))
+                G = nx.barabasi_albert_graph(self.n,m)
+                A = nx.to_numpy_array(G)
+                R = self.generate_res_distribution()
+                R = (R+R.T)/2
+                A = A*R   
+                if self.a>0:
+                    if self.non_normal_type=='sparse':
+                        A = A+self.a*self.sparse_upper_triangular()
+                    elif self.non_normal_type == 'dense':
+                        A = A+self.a*self.dense_upper_triangular()            
+            
+            elif self.reservoir_type == 'watts_strogatz':
+                k = int(np.ceil(self.n*self.res_density))
+                G = nx.watts_strogatz_graph(self.n,k,self.ws_p)
+                A = nx.to_numpy_array(G)
+                R = self.generate_res_distribution()
+                R = (R+R.T)/2
+                A = A*R
+                if self.a>0:
+                    if self.non_normal_type=='sparse':
+                        A = A+self.a*self.sparse_upper_triangular()
+                    elif self.non_normal_type == 'dense':
+                        A = A+self.a*self.dense_upper_triangular()            
+    
+            elif self.reservoir_type == 'toeplitz':
+                A = self.toeplitz_reservoir()
+            
+            elif self.reservoir_type == 'jacobi':
+                A = self.jacobi_matrix()
+            
+            elif self.reservoir_type == 'circulant':
+                A = self.circulant_reservoir()
+            
+            else: 
+                raise ValueError("Note "+str(self.reservoir_type)+" is not an allowed reservoir type.")
+        else:
+            if self.reservoir_type == 'erdos_renyi':
+                G = nx.erdos_renyi_graph(self.n,self.res_density)
+                A = nx.to_numpy_array(G)
+                R = self.generate_res_distribution()
+                R = (R+R.T)/2
+                A = A*R
+                if self.a>0:
+                    A = self.non_normal_maintain_eigs(A)
+            
+            elif self.reservoir_type == 'barabasi_albert':
+                m = int(np.floor(self.n*self.res_density))
+                G = nx.barabasi_albert_graph(self.n,m)
+                A = nx.to_numpy_array(G)
+                R = self.generate_res_distribution()
+                R = (R+R.T)/2
+                A = A*R   
+                if self.a>0:
+                    A = self.non_normal_maintain_eigs(A)         
+            
+            elif self.reservoir_type == 'watts_strogatz':
+                k = int(np.ceil(self.n*self.res_density))
+                G = nx.watts_strogatz_graph(self.n,k,self.ws_p)
+                A = nx.to_numpy_array(G)
+                R = self.generate_res_distribution()
+                R = (R+R.T)/2
+                A = A*R
+                if self.a>0:
+                    A = self.non_normal_maintain_eigs(A)          
+    
+            elif self.reservoir_type == 'toeplitz':
+                A = self.toeplitz_reservoir()
+            
+            elif self.reservoir_type == 'jacobi':
+                A = self.jacobi_matrix()
+            
+            elif self.reservoir_type == 'circulant':
+                A = self.circulant_reservoir()
+            
+            else: 
+                raise ValueError("Note "+str(self.reservoir_type)+" is not an allowed reservoir type.")            
         
         self.A = A
 
@@ -458,6 +506,3 @@ class reservoir_computer:
         T,Z = schur(self.A,output='complex')
         henrici = np.linalg.norm(T-np.diag(np.diagonal(T)),'fro')
         return henrici
-            
-        
-        

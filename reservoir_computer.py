@@ -1,6 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb  3 11:12:37 2026
+
+@author: jafish
+"""
+
 import numpy as np
 import networkx as nx
 from scipy.linalg import schur
+from scipy.spatial.distance import pdist
 
 class reservoir_computer:
     
@@ -69,6 +77,14 @@ class reservoir_computer:
         
         else:
             self.A = A
+            if a>0:
+                print("Warning adding perturbation to A, if you do not want this set a = 0")
+                if non_normal_type == 'sparse':
+                    self.A = self.A+self.sparse_upper_triangular()
+                elif non_normal_type == 'dense':
+                    self.A = self.A+self.dense_upper_triangular()
+                else:
+                    raise ValueError("non_normal_type must be either dense or sparse")
         
         #note scale_A should be set to True unless you passed an already scaled reservoir,
         #so do not set to False unless you have passed your own reservoir
@@ -84,6 +100,10 @@ class reservoir_computer:
         
     def return_Win(self):
         return self.Win
+    
+    def return_A(self):
+        return self.A
+    
     def generate_res_distribution(self):
         if self.res_distribution == 'normal' or self.res_distribution == 'gaussian':
             R = np.random.normal(0,self.res_weights,(self.n,self.n))
@@ -512,3 +532,12 @@ class reservoir_computer:
         T,Z = schur(self.A,output='complex')
         henrici = np.linalg.norm(T-np.diag(np.diagonal(T)),'fro')
         return henrici
+    
+    def min_eigval_dist(self):
+        Eigs = np.linalg.eigvals(self.A)
+        return np.min(pdist(np.real(Eigs).reshape(-1,1)))
+    
+    def mean_eigval_dist(self):
+        Eigs = np.linalg.eigvals(self.A)
+        return np.mean(pdist(np.real(Eigs).reshape(-1,1)))
+    

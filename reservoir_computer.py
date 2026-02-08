@@ -77,14 +77,18 @@ class reservoir_computer:
         
         else:
             self.A = A
-            if a>0:
-                print("Warning adding perturbation to A, if you do not want this set a = 0")
-                if non_normal_type == 'sparse':
-                    self.A = self.A+self.sparse_upper_triangular()
-                elif non_normal_type == 'dense':
-                    self.A = self.A+self.dense_upper_triangular()
-                else:
-                    raise ValueError("non_normal_type must be either dense or sparse")
+            if not maintain_res_eigs:
+                if a>0:
+                    print("Warning adding perturbation to A, if you do not want this set a = 0")
+                    if non_normal_type == 'sparse':
+                        self.A = self.A+self.a*self.sparse_upper_triangular()
+                    elif non_normal_type == 'dense':
+                        self.A = self.A+self.a*self.dense_upper_triangular()
+                    else:
+                        raise ValueError("non_normal_type must be either dense or sparse")
+            else:
+                
+                self.A = self.non_normal_maintain_eigs(A)
         
         #note scale_A should be set to True unless you passed an already scaled reservoir,
         #so do not set to False unless you have passed your own reservoir
@@ -144,7 +148,7 @@ class reservoir_computer:
         else:
             raise ValueError("(Note dense distribution will match res_distribution) res_distribution must either be normal/gaussian or uniform ")
     
-        return U
+        return np.triu(U,k=1)
 
 
     def sparse_upper_triangular(self, value_fn=None):
@@ -347,10 +351,10 @@ class reservoir_computer:
         #use output = 'real' in the schur decomposition
         T,Q = schur(A,output='real')
         if self.non_normal_type == 'sparse':
-            N = self.sparse_upper_triangular()
+            N = self.a*self.sparse_upper_triangular()
         
         else:
-            N = self.dense_upper_triangular()
+            N = self.a*self.dense_upper_triangular()
         newA = Q @ (T+N) @ Q.T
         
         

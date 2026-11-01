@@ -1,0 +1,60 @@
+
+== exp1_a_sweep ===========  N trials: 90
+  Spearman rho(henrici, vpt)    = -0.686
+  Spearman rho(henrici/n, vpt)  = -0.686
+  median VPT / Henrici per a:
+    a=  0.0  median VPT= 341.0  median Henrici=   0.000
+    a=  0.5  median VPT= 342.0  median Henrici=  12.620
+    a=  1.0  median VPT= 335.0  median Henrici=  26.330
+    a=  2.0  median VPT=  18.5  median Henrici=  46.405
+    a=  3.0  median VPT=  10.5  median Henrici=  59.289
+    a=  4.0  median VPT=   8.5  median Henrici=  65.742
+    a=  6.0  median VPT=  13.5  median Henrici=  70.557
+    a=  8.0  median VPT=  21.5  median Henrici=  68.988
+    a= 10.0  median VPT=  13.0  median Henrici=  71.291
+
+== exp2_n_vs_a ===========  N trials: 120
+  Spearman rho(henrici, vpt)    = -0.771
+  Spearman rho(henrici/n, vpt)  = -0.220
+  median VPT / Henrici per a:
+    a=  0.0  median VPT= 341.0  median Henrici=   0.000
+    a=  1.0  median VPT= 117.5  median Henrici=  32.436
+    a=  2.0  median VPT=   6.5  median Henrici=  57.363
+    a=  4.0  median VPT=  10.5  median Henrici=  77.094
+    a=  6.0  median VPT=  11.0  median Henrici=  87.031
+  median VPT at a=0 per n:
+    n=  100  median VPT= 352.0
+    n=  200  median VPT= 340.5
+    n=  400  median VPT= 337.5
+    n=  800  median VPT= 278.0
+
+== exp3_sr_vs_a ===========  N trials: 120
+  Spearman rho(henrici, vpt)    = -0.173
+  Spearman rho(henrici/n, vpt)  = -0.173
+  median VPT / Henrici per a:
+    a=  0.0  median VPT= 344.0  median Henrici=   0.000
+    a=  1.0  median VPT=  96.5  median Henrici=  20.454
+    a=  2.0  median VPT=  19.0  median Henrici=  29.526
+    a=  4.0  median VPT=  16.0  median Henrici=  38.313
+    a=  6.0  median VPT=  13.5  median Henrici=  38.585
+
+== exp4_alpha_vs_a ===========  N trials: 150
+  Spearman rho(henrici, vpt)    = -0.741
+  Spearman rho(henrici/n, vpt)  = -0.741
+  median VPT / Henrici per a:
+    a=  0.0  median VPT= 338.0  median Henrici=   0.000
+    a=  1.0  median VPT= 188.5  median Henrici=  24.792
+    a=  2.0  median VPT=  25.0  median Henrici=  39.669
+    a=  4.0  median VPT=  19.0  median Henrici=  50.098
+    a=  6.0  median VPT=  14.5  median Henrici=  53.892
+
+== exp5_n_sr_pair ===========  N trials: 72
+  Spearman rho(henrici, vpt)    = -0.794
+  Spearman rho(henrici/n, vpt)  = -0.534
+  median VPT / Henrici per a:
+    a=  0.0  median VPT= 347.0  median Henrici=   0.000
+    a=  2.0  median VPT=  12.5  median Henrici=  36.514
+    a=  6.0  median VPT=  14.0  median Henrici=  50.002
+  median VPT at a=0 per n:
+    n=  100  median VPT= 348.0
+    n=  400  median VPT= 341.0

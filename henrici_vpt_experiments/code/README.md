@@ -5,8 +5,7 @@ Henrici departure** (larger departure from normality) tend to produce
 **shorter valid prediction times (VPT)** on the Lorenz-63 system, across
 several reservoir parameters.
 
-Built on top of `reservoir_computer.py` (your `reservoir_computer` class,
-used **unmodified**). The Henrici departure is the class's
+Built on top of `reservoir_computer.py`. The Henrici departure is the class's
 `henrici_departure()` method and the VPT is the class's
 `valid_prediction_time()` method (threshold = 0.5·std of the true data).
 
